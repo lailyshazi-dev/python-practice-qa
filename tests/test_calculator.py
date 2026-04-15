@@ -1,6 +1,6 @@
 import pytest
 
-from src.calculator import add, divide, is_even, max_number, min_number, multiply, power, subtract, square
+from src.calculator import add, divide, is_even, max_number, min_number, multiply, power, subtract, square, average 
 
 
 def test_add_positive_numbers():
@@ -74,3 +74,16 @@ def test_min_number(a, b, expected):
 
 def test_square():
     assert square(5) == 25
+
+
+@pytest.mark.parametrize(
+    "a, b, expected",
+    [
+        (2, 4, 3),
+        (10, 20, 15),
+        (-2, 2, 0),
+        (1.5, 2.5, 2),
+    ],
+)
+def test_average(a, b, expected):
+    assert average(a, b) == expected

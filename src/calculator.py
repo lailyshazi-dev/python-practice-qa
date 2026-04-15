@@ -35,3 +35,7 @@ def min_number(a: int | float, b: int | float) -> int | float:
 
 def square(number: int | float) -> int | float:
     return number * number
+
+
+def average(a: int | float, b: int | float) -> float:
+    return (a + b) / 2
