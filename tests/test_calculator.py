@@ -1,6 +1,6 @@
 import pytest
 
-from src.calculator import add, divide, is_even, max_number, min_number, multiply, power, subtract
+from src.calculator import add, divide, is_even, max_number, min_number, multiply, power, subtract, square
 
 
 def test_add_positive_numbers():
@@ -70,3 +70,7 @@ def test_max_number(a, b, expected):
 )
 def test_min_number(a, b, expected):
     assert min_number(a, b) == expected
+
+
+def test_square():
+    assert square(5) == 25

@@ -31,3 +31,7 @@ def max_number(a: int | float, b: int | float) -> int | float:
 
 def min_number(a: int | float, b: int | float) -> int | float:
     return min(a, b)
+
+
+def square(number: int | float) -> int | float:
+    return number * number
