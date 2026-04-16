@@ -39,3 +39,15 @@ def square(number: int | float) -> int | float:
 
 def average(a: int | float, b: int | float) -> float:
     return (a + b) / 2
+
+
+def factorial(number: int) -> int:
+    if number < 0:
+        raise ValueError("Factorial is not defined for negative numbers")
+
+    result = 1
+
+    for value in range(1, number + 1):
+        result = result * value
+
+    return result

@@ -1,6 +1,6 @@
 import pytest
 
-from src.calculator import add, divide, is_even, max_number, min_number, multiply, power, subtract, square, average 
+from src.calculator import add, divide, is_even, max_number, min_number, multiply, power, subtract, square, average, factorial 
 
 
 def test_add_positive_numbers():
@@ -87,3 +87,21 @@ def test_square():
 )
 def test_average(a, b, expected):
     assert average(a, b) == expected
+
+
+@pytest.mark.parametrize(
+    "number, expected",
+    [
+        (0, 1),
+        (1, 1),
+        (3, 6),
+        (5, 120),
+    ],
+)
+def test_factorial(number, expected):
+    assert factorial(number) == expected
+
+
+def test_factorial_with_negative_number_raises_error():
+    with pytest.raises(ValueError, match="Factorial is not defined for negative numbers"):
+        factorial(-1)
