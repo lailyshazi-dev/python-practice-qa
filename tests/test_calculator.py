@@ -3,12 +3,6 @@ import pytest
 from src.calculator import add, divide, is_even, max_number, min_number, multiply, power, subtract, square, average, factorial, list_sum, list_average
 
 
-@pytest.fixture
-def sample_numbers():
-    return [1, 2, 3, 4, 5]
- 
-
-
 def test_add_positive_numbers():
     assert add(2, 3) == 5
 
