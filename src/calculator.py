@@ -51,3 +51,14 @@ def factorial(number: int) -> int:
         result = result * value
 
     return result
+
+
+def list_sum(numbers: list[int | float]) -> int | float:
+    return sum(numbers)
+
+
+def list_average(numbers: list[int | float]) -> float:
+    if len(numbers) == 0:
+        raise ValueError("Cannot calculate average of empty list")
+
+    return sum(numbers) / len(numbers)

@@ -1,6 +1,12 @@
 import pytest
 
-from src.calculator import add, divide, is_even, max_number, min_number, multiply, power, subtract, square, average, factorial 
+from src.calculator import add, divide, is_even, max_number, min_number, multiply, power, subtract, square, average, factorial, list_sum, list_average
+
+
+@pytest.fixture
+def sample_numbers():
+    return [1, 2, 3, 4, 5]
+ 
 
 
 def test_add_positive_numbers():
@@ -105,3 +111,16 @@ def test_factorial(number, expected):
 def test_factorial_with_negative_number_raises_error():
     with pytest.raises(ValueError, match="Factorial is not defined for negative numbers"):
         factorial(-1)
+
+
+def test_list_sum(sample_numbers):
+    assert list_sum(sample_numbers) == 15
+
+
+def test_list_average(sample_numbers):
+    assert list_average(sample_numbers) == 3
+
+
+def test_list_average_with_empty_list_raises_error():
+    with pytest.raises(ValueError, match="Cannot calculate average of empty list"):
+        list_average([])
