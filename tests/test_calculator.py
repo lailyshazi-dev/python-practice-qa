@@ -123,3 +123,53 @@ def test_list_average_with_empty_list_raises_error():
 def test_calculator_config(calculator_config):
     assert calculator_config["precision"] == 2
     assert calculator_config["mode"] == "standard"
+
+
+@pytest.mark.smoke
+def test_add_positive_numbers():
+    assert add(2, 3) == 5
+
+
+@pytest.mark.smoke
+def test_subtract_positive_numbers():
+    assert subtract(10, 4) == 6
+
+
+@pytest.mark.smoke
+def test_multiply_positive_numbers():
+    assert multiply(6, 7) == 42
+
+
+@pytest.mark.negative
+def test_divide_by_zero_raises_error():
+    with pytest.raises(ValueError, match="Cannot divide by zero"):
+        divide(10, 0)
+
+
+@pytest.mark.negative
+def test_factorial_with_negative_number_raises_error():
+    with pytest.raises(ValueError, match="Factorial is not defined for negative numbers"):
+        factorial(-1)
+
+
+@pytest.mark.negative
+def test_list_average_with_empty_list_raises_error():
+    with pytest.raises(ValueError, match="Cannot calculate average of empty list"):
+        list_average([])
+
+
+@pytest.mark.regression
+@pytest.mark.parametrize(
+    "number, expected",
+    [
+        (4, True),
+        (5, False),
+        (0, True),
+        (-2, True),
+        (-3, False),
+    ],
+)
+def test_is_even(number, expected):
+    assert is_even(number) is expected
+
+
