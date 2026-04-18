@@ -118,3 +118,8 @@ def test_list_average(sample_numbers):
 def test_list_average_with_empty_list_raises_error():
     with pytest.raises(ValueError, match="Cannot calculate average of empty list"):
         list_average([])
+
+
+def test_calculator_config(calculator_config):
+    assert calculator_config["precision"] == 2
+    assert calculator_config["mode"] == "standard"
