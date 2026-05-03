@@ -1,3 +1,4 @@
+import pytest
 import requests
 
 
@@ -25,3 +26,12 @@ def test_get_post_by_id_has_expected_id():
     data = response.json()
 
     assert data["id"] == 1
+
+
+@pytest.mark.parametrize("post_id", [1, 2, 3, 4, 5])
+def test_get_post_by_id_parametrized(post_id):
+    response = requests.get(f"{BASE_URL}/posts/{post_id}")
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data["id"] == post_id
