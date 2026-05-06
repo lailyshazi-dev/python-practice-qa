@@ -32,6 +32,7 @@ def test_get_post_by_id_parametrized(api_client, post_id):
     assert response.status_code == 200
     assert data["id"] == post_id
 
+
 def test_get_missing_post_returns_404(api_client):
     response = api_client.get_post(999999)
 
@@ -43,3 +44,17 @@ def test_get_missing_post_returns_empty_body(api_client):
     data = response.json()
 
     assert data == {}
+
+
+def test_get_posts_status_code(api_client):
+    response = api_client.get_posts()
+
+    assert response.status_code == 200
+
+
+def test_get_posts_returns_list(api_client):
+    response = api_client.get_posts()
+    data = response.json()
+
+    assert isinstance(data, list)
+    assert len(data) > 0

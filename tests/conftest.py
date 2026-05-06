@@ -9,6 +9,9 @@ class ApiClient:
     def get_post(self, post_id: int):
         return requests.get(f"{self.base_url}/posts/{post_id}")
 
+    def get_posts(self):
+        return requests.get(f"{self.base_url}/posts")
+
 
 @pytest.fixture(scope="function")
 def sample_numbers():
