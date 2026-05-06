@@ -58,3 +58,25 @@ def test_get_posts_returns_list(api_client):
 
     assert isinstance(data, list)
     assert len(data) > 0
+
+
+def test_get_posts_items_have_expected_fields(api_client):
+    response = api_client.get_posts()
+    data = response.json()
+
+    for post in data:
+        assert "userId" in post
+        assert "id" in post
+        assert "title" in post
+        assert "body" in post
+
+
+def test_get_posts_items_have_expected_types(api_client):
+    response = api_client.get_posts()
+    data = response.json()
+
+    for post in data:
+        assert isinstance(post["userId"], int)
+        assert isinstance(post["id"], int)
+        assert isinstance(post["title"], str)
+        assert isinstance(post["body"], str)
