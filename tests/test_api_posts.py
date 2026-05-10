@@ -36,12 +36,14 @@ def test_get_post_by_id_parametrized(api_client, post_id):
     assert data["id"] == post_id
 
 
+@pytest.mark.negative
 def test_get_missing_post_returns_404(api_client):
     response = api_client.get_post(999999)
 
     assert response.status_code == 404
 
 
+@pytest.mark.negative
 def test_get_missing_post_returns_empty_body(api_client):
     response = api_client.get_post(999999)
     data = response.json()
