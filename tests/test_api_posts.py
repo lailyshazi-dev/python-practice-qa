@@ -1,6 +1,9 @@
 import pytest
 
 
+pytestmark = pytest.mark.api
+
+
 def test_get_post_by_id_status_code(api_client):
     response = api_client.get_post(1)
 
