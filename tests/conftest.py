@@ -3,14 +3,15 @@ import requests
 
 
 class ApiClient:
-    def __init__(self, base_url: str):
+    def __init__(self, base_url: str, timeout: int = 5):
         self.base_url = base_url
+        self.timeout = timeout
 
     def get_post(self, post_id: int):
-        return requests.get(f"{self.base_url}/posts/{post_id}")
+        return requests.get(f"{self.base_url}/posts/{post_id}", timeout=self.timeout)
 
     def get_posts(self):
-        return requests.get(f"{self.base_url}/posts")
+        return requests.get(f"{self.base_url}/posts", timeout=self.timeout)
 
 
 @pytest.fixture(scope="function")
