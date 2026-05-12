@@ -7,11 +7,14 @@ class ApiClient:
         self.base_url = base_url
         self.timeout = timeout
 
+    def get(self, path: str):
+        return requests.get(f"{self.base_url}{path}", timeout=self.timeout)
+
     def get_post(self, post_id: int):
-        return requests.get(f"{self.base_url}/posts/{post_id}", timeout=self.timeout)
+        return self.get(f"/posts/{post_id}")
 
     def get_posts(self):
-        return requests.get(f"{self.base_url}/posts", timeout=self.timeout)
+        return self.get("/posts")
 
 
 @pytest.fixture(scope="function")
