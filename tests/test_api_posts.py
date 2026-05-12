@@ -85,3 +85,9 @@ def test_get_posts_items_have_expected_types(api_client):
         assert isinstance(post["id"], int)
         assert isinstance(post["title"], str)
         assert isinstance(post["body"], str)
+
+
+def test_get_posts_response_time_is_less_than_one_second(api_client):
+    response = api_client.get_posts()
+
+    assert response.elapsed.total_seconds() < 1
