@@ -2,7 +2,7 @@ import requests
 
 
 class ApiClient:
-    def __init__(self, base_url: str, timeout: int = 5):
+    def __init__(self, base_url: str, timeout: int = 10):
         self.base_url = base_url
         self.timeout = timeout
 
@@ -14,3 +14,10 @@ class ApiClient:
 
     def get_posts(self):
         return self.get("/posts")
+
+    def post(self, path: str, json: dict):
+        return requests.post(f"{self.base_url}{path}", json=json, timeout=self.timeout)
+
+    def create_post(self, payload: dict):
+        return self.post("/posts", json=payload)
+

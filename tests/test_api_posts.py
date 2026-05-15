@@ -91,3 +91,31 @@ def test_get_posts_response_time_is_less_than_one_second(api_client):
     response = api_client.get_posts()
 
     assert response.elapsed.total_seconds() < 1
+
+
+def test_create_post_status_code(api_client):
+    payload = {
+        "title": "Test title",
+        "body": "Test body",
+        "userId": 1,
+    }
+
+    response = api_client.create_post(payload)
+
+    assert response.status_code == 201
+
+
+def test_create_post_response_contains_sent_data(api_client):
+    payload = {
+        "title": "Test title",
+        "body": "Test body",
+        "userId": 1,
+    }
+
+    response = api_client.create_post(payload)
+    data = response.json()
+
+    assert data["title"] == payload["title"]
+    assert data["body"] == payload["body"]
+    assert data["userId"] == payload["userId"]
+    assert "id" in data
