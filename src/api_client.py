@@ -21,3 +21,8 @@ class ApiClient:
     def create_post(self, payload: dict):
         return self.post("/posts", json=payload)
 
+    def put(self, path: str, json: dict):
+        return requests.put(f"{self.base_url}{path}", json=json, timeout=self.timeout)
+
+    def update_post(self, post_id: int, payload: dict):
+        return self.put(f"/posts/{post_id}", json=payload)

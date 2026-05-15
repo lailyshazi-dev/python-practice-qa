@@ -119,3 +119,33 @@ def test_create_post_response_contains_sent_data(api_client):
     assert data["body"] == payload["body"]
     assert data["userId"] == payload["userId"]
     assert "id" in data
+
+
+def test_update_post_status_code(api_client):
+    payload = {
+        "id": 1,
+        "title": "Updated title",
+        "body": "Updated body",
+        "userId": 1,
+    }
+
+    response = api_client.update_post(1, payload)
+
+    assert response.status_code == 200
+
+
+def test_update_post_response_contains_updated_data(api_client):
+    payload = {
+        "id": 1,
+        "title": "Updated title",
+        "body": "Updated body",
+        "userId": 1,
+    }
+
+    response = api_client.update_post(1, payload)
+    data = response.json()
+
+    assert data["id"] == payload["id"]
+    assert data["title"] == payload["title"]
+    assert data["body"] == payload["body"]
+    assert data["userId"] == payload["userId"]
