@@ -149,3 +149,25 @@ def test_update_post_response_contains_updated_data(api_client):
     assert data["title"] == payload["title"]
     assert data["body"] == payload["body"]
     assert data["userId"] == payload["userId"]
+
+
+def test_patch_post_status_code(api_client):
+    payload = {
+        "title": "Patched title",
+    }
+
+    response = api_client.patch_post(1, payload)
+
+    assert response.status_code == 200
+
+
+def test_patch_post_response_contains_updated_field(api_client):
+    payload = {
+        "title": "Patched title",
+    }
+
+    response = api_client.patch_post(1, payload)
+    data = response.json()
+
+    assert data["id"] == 1
+    assert data["title"] == payload["title"]
