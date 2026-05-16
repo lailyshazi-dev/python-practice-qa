@@ -17,14 +17,15 @@
 - Проверка времени ответа помогает заметить слишком медленный API.
 - Такие тесты могут быть нестабильными, потому что зависят от сети.
 - Нестабильный тест называют `flaky test`.
+- Для внешнего публичного API слишком жесткий лимит может давать ложные падения.
 
 ## Код дня
 
 ```python
-def test_get_posts_response_time_is_less_than_one_second(api_client):
+def test_get_posts_response_time_is_within_timeout(api_client):
     response = api_client.get_posts()
 
-    assert response.elapsed.total_seconds() < 1
+    assert response.elapsed.total_seconds() < api_client.timeout
 ```
 
 ## Команды дня
