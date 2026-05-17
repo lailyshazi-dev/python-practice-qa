@@ -23,9 +23,11 @@ python-practice-qa/
   pytest.ini
   requirements.txt
   src/
+    api_client.py
     calculator.py
   tests/
     conftest.py
+    test_api_posts.py
     test_calculator.py
   notes/
     day_01.md
@@ -35,7 +37,7 @@ python-practice-qa/
 
 Что где лежит:
 
-- `src/` - код, который мы тестируем.
+- `src/` - код, который мы тестируем: функции и API-клиент.
 - `tests/` - автотесты.
 - `tests/conftest.py` - общие фикстуры pytest.
 - `notes/` - учебные конспекты.
@@ -43,7 +45,125 @@ python-practice-qa/
 - `pytest.ini` - настройки pytest.
 - `requirements.txt` - зависимости проекта.
 
-## 3. Python: функции
+## 3. API: главная идея
+
+API - это способ общения программ друг с другом через запросы и ответы.
+
+В наших тестах мы работаем с HTTP-запросами:
+
+- `GET` - получить данные.
+- `POST` - создать данные.
+- `PUT` - полностью обновить ресурс.
+- `PATCH` - частично обновить ресурс.
+- `DELETE` - удалить ресурс.
+
+Пример:
+
+```python
+response = api_client.get_post(1)
+data = response.json()
+
+assert response.status_code == 200
+assert data["id"] == 1
+```
+
+Что важно:
+
+- `response.status_code` - HTTP-статус ответа.
+- `response.json()` - превращает JSON-ответ в Python-словарь или список.
+- API-тест должен проверять не только статус, но и данные в ответе.
+- Для списков важно проверять структуру объектов и типы полей.
+
+## 4. API client
+
+Чтобы не писать `requests.get(...)` в каждом тесте, мы вынесли общий код в `src/api_client.py`.
+
+Пример:
+
+```python
+class ApiClient:
+    def __init__(self, base_url: str, timeout: int = 10):
+        self.base_url = base_url
+        self.timeout = timeout
+
+    def get(self, path: str):
+        return requests.get(f"{self.base_url}{path}", timeout=self.timeout)
+```
+
+Методы клиента:
+
+- `get_post(post_id)` - получить один пост.
+- `get_posts()` - получить список постов.
+- `create_post(payload)` - создать пост.
+- `update_post(post_id, payload)` - полностью обновить пост.
+- `patch_post(post_id, payload)` - частично обновить пост.
+- `delete_post(post_id)` - удалить пост.
+
+Зачем это нужно:
+
+- меньше повторения в тестах;
+- легче добавлять общую логику в одном месте;
+- удобнее развивать проект дальше.
+
+## 5. API tests: что мы уже умеем
+
+Мы уже проверяем:
+
+- успешные ответы `200` и `201`;
+- негативный сценарий `404`;
+- поля ответа `userId`, `id`, `title`, `body`;
+- типы данных в ответе;
+- список объектов;
+- время ответа API;
+- отправленные данные после `POST`;
+- обновленные данные после `PUT` и `PATCH`;
+- пустое тело ответа после `DELETE`.
+
+Пример теста с параметризацией:
+
+```python
+@pytest.mark.parametrize("post_id", [1, 2, 3, 4, 5])
+def test_get_post_by_id_parametrized(api_client, post_id):
+    response = api_client.get_post(post_id)
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data["id"] == post_id
+```
+
+Пример payload-фикстуры:
+
+```python
+@pytest.fixture
+def new_post_payload():
+    return {
+        "title": "Test title",
+        "body": "Test body",
+        "userId": 1,
+    }
+```
+
+## 6. API tests: важные рабочие идеи
+
+- `timeout` ограничивает ожидание ответа и защищает тесты от зависания.
+- `response.elapsed` показывает время ответа.
+- Слишком жесткая проверка времени может сделать тест `flaky`.
+- Один файл можно пометить общим маркером:
+
+```python
+pytestmark = pytest.mark.api
+```
+
+- Один тест может иметь несколько маркеров, например `api` и `negative`.
+- Можно запускать разные наборы:
+
+```powershell
+python -m pytest -m api
+python -m pytest -m "api and negative"
+python -m pytest -m "api and not negative"
+```
+
+## 7. Python: функции
 
 Функция - это отдельное действие, которому можно дать имя.
 
@@ -77,7 +197,7 @@ def add(a: int | float, b: int | float) -> int | float:
 - `list_sum` - сумма списка.
 - `list_average` - среднее значение списка.
 
-## 4. Python: условия и ошибки
+## 8. Python: условия и ошибки
 
 Условие используется, когда программа должна выбрать поведение.
 
@@ -106,7 +226,7 @@ def factorial(number: int) -> int:
         raise ValueError("Factorial is not defined for negative numbers")
 ```
 
-## 5. pytest: базовая идея
+## 9. pytest: базовая идея
 
 pytest - фреймворк для запуска тестов.
 
@@ -130,7 +250,7 @@ def test_add_positive_numbers():
 python -m pytest
 ```
 
-## 6. pytest: импорт функций
+## 10. pytest: импорт функций
 
 Чтобы протестировать функцию из другого файла, ее нужно импортировать.
 
@@ -148,7 +268,7 @@ NameError: name 'power' is not defined
 
 Причина: функция есть в `calculator.py`, но не импортирована в тестовый файл.
 
-## 7. pytest: параметризация
+## 11. pytest: параметризация
 
 Параметризация позволяет запускать один тест с разными данными.
 
@@ -182,7 +302,7 @@ def test_is_even(number, expected):
 - легче добавить новые проверки;
 - тест выглядит как таблица сценариев.
 
-## 8. pytest: негативные тесты и pytest.raises
+## 12. pytest: негативные тесты и pytest.raises
 
 Негативный тест проверяет неправильные или запрещенные данные.
 
@@ -206,7 +326,7 @@ def test_divide_by_zero_raises_error():
 - факториал отрицательного числа;
 - среднее значение пустого списка.
 
-## 9. pytest: фикстуры
+## 13. pytest: фикстуры
 
 Фикстура готовит данные или состояние для теста.
 
@@ -232,7 +352,7 @@ def test_list_sum(sample_numbers):
 - `pytest` видит аргумент `sample_numbers`.
 - Потом pytest находит фикстуру с таким же именем и передает в тест результат.
 
-## 10. pytest: conftest.py
+## 14. pytest: conftest.py
 
 `conftest.py` - специальный файл pytest для общих фикстур.
 
@@ -262,7 +382,7 @@ def sample_numbers():
 - Фикстуры из `conftest.py` доступны тестам в этой папке и вложенных папках.
 - Это удобно, когда тестовых файлов становится много.
 
-## 11. pytest: fixture scope
+## 15. pytest: fixture scope
 
 Scope управляет тем, как часто создается фикстура.
 
@@ -298,7 +418,7 @@ Scope управляет тем, как часто создается фикст
 - страницу лучше готовить отдельно для теста;
 - тестовые данные можно создавать фикстурами.
 
-## 12. pytest: markers
+## 16. pytest: markers
 
 Маркер - это метка теста.
 
@@ -325,6 +445,7 @@ markers =
     smoke: critical fast tests
     regression: full regression test set
     negative: tests for invalid input and errors
+    api: API tests
 ```
 
 Запуск:
@@ -333,6 +454,8 @@ markers =
 python -m pytest -m smoke
 python -m pytest -m negative
 python -m pytest -m "not negative"
+python -m pytest -m api
+python -m pytest -m "api and negative"
 ```
 
 Что значит `deselected`:
@@ -340,7 +463,7 @@ python -m pytest -m "not negative"
 - pytest нашел тесты;
 - но не выбрал их для запуска из-за фильтра `-m`.
 
-## 13. pytest: режимы запуска
+## 17. pytest: режимы запуска
 
 Обычный запуск:
 
@@ -380,7 +503,7 @@ python -m pytest -v -m smoke
 
 Запускает только smoke-тесты и показывает их подробно.
 
-## 14. Git: главная идея
+## 18. Git: главная идея
 
 Git хранит историю проекта.
 
@@ -407,7 +530,7 @@ git commit -m "Message"
 git log --oneline
 ```
 
-## 15. Git: основные команды
+## 19. Git: основные команды
 
 Проверить состояние:
 
@@ -441,7 +564,7 @@ git commit -m "Add feature"
 git log --oneline
 ```
 
-## 16. Git: ветки
+## 20. Git: ветки
 
 Ветка - отдельная линия работы над задачей.
 
@@ -481,7 +604,7 @@ git branch -d feature/add-new-tests
 Одна ветка - одна небольшая задача.
 ```
 
-## 17. GitHub
+## 21. GitHub
 
 Git хранит историю локально.
 
@@ -520,7 +643,7 @@ HEAD -> master, origin/master
 
 значит локальный проект и GitHub находятся на одном коммите.
 
-## 18. Рабочий процесс QA Automation
+## 22. Рабочий процесс QA Automation
 
 Обычный цикл работы:
 
@@ -554,7 +677,7 @@ git push
 git branch -d feature/task-name
 ```
 
-## 19. Блок-схема рабочего процесса
+## 23. Блок-схема рабочего процесса
 
 ```mermaid
 flowchart TD
@@ -578,7 +701,7 @@ flowchart TD
     P --> Q["Конец задачи"]
 ```
 
-## 20. Упрощенная блок-схема для тетради
+## 24. Упрощенная блок-схема для тетради
 
 ```text
 [Задача]
@@ -616,7 +739,7 @@ flowchart TD
 [заметка]
 ```
 
-## 21. Как продолжать конспект
+## 25. Как продолжать конспект
 
 После каждого урока добавлять блок:
 
@@ -646,7 +769,7 @@ flowchart TD
 ...
 ````
 
-## 22. Словарь
+## 26. Словарь
 
 - `function` - функция.
 - `return` - вернуть результат.
@@ -667,8 +790,24 @@ flowchart TD
 - `remote` - удаленный репозиторий.
 - `push` - отправка коммитов на GitHub.
 - `deselected` - тест найден, но не выбран для запуска.
+- `API` - способ общения программ друг с другом.
+- `HTTP` - протокол запросов и ответов.
+- `GET` - получить данные.
+- `POST` - создать данные.
+- `PUT` - полностью обновить ресурс.
+- `PATCH` - частично обновить ресурс.
+- `DELETE` - удалить ресурс.
+- `payload` - данные, которые отправляются в запросе.
+- `JSON` - формат данных.
+- `status code` - код ответа сервера.
+- `response body` - тело ответа.
+- `API client` - объект для отправки API-запросов.
+- `timeout` - ограничение времени ожидания ответа.
+- `flaky test` - нестабильный тест.
+- `response time` - время ответа.
+- `test data` - тестовые данные.
 
-## 23. Что уже есть в портфолио
+## 27. Что уже есть в портфолио
 
 В проекте уже есть:
 
@@ -681,20 +820,29 @@ flowchart TD
 - `conftest.py`.
 - Fixture scope.
 - Pytest markers.
+- HTML-отчеты pytest.
 - `pytest.ini`.
+- API-тесты через `requests`.
+- `ApiClient` в `src/api_client.py`.
+- GET, POST, PUT, PATCH, DELETE.
+- Позитивные и негативные API-сценарии.
+- Проверка JSON-ответов.
+- Проверка структуры и типов данных.
+- API-маркер и комбинированные фильтры.
+- Timeout и разбор flaky-теста.
+- Payload-фикстуры для тестовых данных.
 - README с командами запуска.
 - Git-история.
 - GitHub-репозиторий.
 - Учебные заметки.
 
-## 24. Следующие темы
+## 28. Следующие темы
 
 Дальше можно добавлять:
 
-- HTML-отчеты pytest.
-- `pytest-html`.
-- API-тесты через `requests`.
-- JSON и проверки API-ответов.
+- разбиение тестов по файлам и модулям;
+- более аккуратную структуру API-тестов;
+- mock и monkeypatch;
 - Playwright.
 - Selenium.
 - Page Object Model.
