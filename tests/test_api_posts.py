@@ -93,84 +93,50 @@ def test_get_posts_response_time_is_within_timeout(api_client):
     assert response.elapsed.total_seconds() < api_client.timeout
 
 
-def test_create_post_status_code(api_client):
-    payload = {
-        "title": "Test title",
-        "body": "Test body",
-        "userId": 1,
-    }
-
-    response = api_client.create_post(payload)
+def test_create_post_status_code(api_client, new_post_payload):
+    response = api_client.create_post(new_post_payload)
 
     assert response.status_code == 201
 
 
-def test_create_post_response_contains_sent_data(api_client):
-    payload = {
-        "title": "Test title",
-        "body": "Test body",
-        "userId": 1,
-    }
-
-    response = api_client.create_post(payload)
+def test_create_post_response_contains_sent_data(api_client, new_post_payload):
+    response = api_client.create_post(new_post_payload)
     data = response.json()
 
-    assert data["title"] == payload["title"]
-    assert data["body"] == payload["body"]
-    assert data["userId"] == payload["userId"]
+    assert data["title"] == new_post_payload["title"]
+    assert data["body"] == new_post_payload["body"]
+    assert data["userId"] == new_post_payload["userId"]
     assert "id" in data
 
 
-def test_update_post_status_code(api_client):
-    payload = {
-        "id": 1,
-        "title": "Updated title",
-        "body": "Updated body",
-        "userId": 1,
-    }
-
-    response = api_client.update_post(1, payload)
+def test_update_post_status_code(api_client, updated_post_payload):
+    response = api_client.update_post(1, updated_post_payload)
 
     assert response.status_code == 200
 
 
-def test_update_post_response_contains_updated_data(api_client):
-    payload = {
-        "id": 1,
-        "title": "Updated title",
-        "body": "Updated body",
-        "userId": 1,
-    }
-
-    response = api_client.update_post(1, payload)
+def test_update_post_response_contains_updated_data(api_client, updated_post_payload):
+    response = api_client.update_post(1, updated_post_payload)
     data = response.json()
 
-    assert data["id"] == payload["id"]
-    assert data["title"] == payload["title"]
-    assert data["body"] == payload["body"]
-    assert data["userId"] == payload["userId"]
+    assert data["id"] == updated_post_payload["id"]
+    assert data["title"] == updated_post_payload["title"]
+    assert data["body"] == updated_post_payload["body"]
+    assert data["userId"] == updated_post_payload["userId"]
 
 
-def test_patch_post_status_code(api_client):
-    payload = {
-        "title": "Patched title",
-    }
-
-    response = api_client.patch_post(1, payload)
+def test_patch_post_status_code(api_client, patched_post_payload):
+    response = api_client.patch_post(1, patched_post_payload)
 
     assert response.status_code == 200
 
 
-def test_patch_post_response_contains_updated_field(api_client):
-    payload = {
-        "title": "Patched title",
-    }
-
-    response = api_client.patch_post(1, payload)
+def test_patch_post_response_contains_updated_field(api_client, patched_post_payload):
+    response = api_client.patch_post(1, patched_post_payload)
     data = response.json()
 
     assert data["id"] == 1
-    assert data["title"] == payload["title"]
+    assert data["title"] == patched_post_payload["title"]
 
 
 def test_delete_post_status_code(api_client):
