@@ -32,3 +32,9 @@ class ApiClient:
 
     def patch_post(self, post_id: int, payload: dict):
         return self.patch(f"/posts/{post_id}", json=payload)
+
+    def delete(self, path: str):
+        return requests.delete(f"{self.base_url}{path}", timeout=self.timeout)
+
+    def delete_post(self, post_id: int):
+        return self.delete(f"/posts/{post_id}")
