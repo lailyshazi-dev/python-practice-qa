@@ -20,40 +20,36 @@ notes/    короткие конспекты
 
 ## Как запустить тесты
 
+Проект настроен через `pytest.ini`: pytest автоматически ищет тесты в папке `tests` и использует короткий вывод.
+
 Запуск всех тестов:
 
 ```powershell
 python -m pytest
 ```
 
-Короткий запуск всех тестов:
-
-```powershell
-python -m pytest -q
-```
-
 Запуск только API-тестов по папке:
 
 ```powershell
-python -m pytest tests/api -q
+python -m pytest tests/api
 ```
 
 Запуск только API-тестов по маркеру:
 
 ```powershell
-python -m pytest -m api -q
+python -m pytest -m api
 ```
 
 Запуск негативных API-тестов:
 
 ```powershell
-python -m pytest -m "api and negative" -q
+python -m pytest -m "api and negative"
 ```
 
 Запуск API-тестов без негативных сценариев:
 
 ```powershell
-python -m pytest -m "api and not negative" -q
+python -m pytest -m "api and not negative"
 ```
 
 Генерация HTML-отчета:
