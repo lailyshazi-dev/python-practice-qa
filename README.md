@@ -24,5 +24,42 @@ notes/    короткие конспекты
 
 ```powershell
 python -m pytest
+```
+
+Короткий запуск всех тестов:
+
+```powershell
+python -m pytest -q
+```
+
+Запуск только API-тестов по папке:
+
+```powershell
+python -m pytest tests/api -q
+```
+
+Запуск только API-тестов по маркеру:
+
+```powershell
+python -m pytest -m api -q
+```
+
+Запуск негативных API-тестов:
+
+```powershell
+python -m pytest -m "api and negative" -q
+```
+
+Запуск API-тестов без негативных сценариев:
+
+```powershell
+python -m pytest -m "api and not negative" -q
+```
+
+Генерация HTML-отчета:
+
+```powershell
+python -m pytest --html=reports/report.html --self-contained-html
+```
 
 
