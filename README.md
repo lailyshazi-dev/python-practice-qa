@@ -58,4 +58,22 @@ python -m pytest -m "api and not negative"
 python -m pytest --html=reports/report.html --self-contained-html
 ```
 
+Выборочный запуск одного файла:
+
+```powershell
+python -m pytest tests/api/test_update_post.py
+```
+
+Выборочный запуск одного теста:
+
+```powershell
+python -m pytest tests/api/test_update_post.py::test_update_post_status_code
+```
+
+Выборочный запуск по части названия:
+
+```powershell
+python -m pytest -k "update and status"
+```
+
 
