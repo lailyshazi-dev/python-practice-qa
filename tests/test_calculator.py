@@ -120,6 +120,12 @@ def test_divide_by_zero_raises_error():
 
 
 @pytest.mark.negative
+def test_divide_negative_number_by_zero_raises_error():
+    with pytest.raises(ValueError, match="Cannot divide by zero"):
+        divide(-10, 0)
+        
+
+@pytest.mark.negative
 def test_factorial_with_negative_number_raises_error():
     with pytest.raises(ValueError, match="Factorial is not defined for negative numbers"):
         factorial(-1)
@@ -131,6 +137,14 @@ def test_list_average_with_empty_list_raises_error():
         list_average([])
 
 
+@pytest.mark.negative
+def test_list_average_with_another_empty_list_raises_error():
+    empty_numbers = []
+
+    with pytest.raises(ValueError, match="Cannot calculate average of empty list"):
+        list_average(empty_numbers)
+        
+        
 @pytest.mark.regression
 @pytest.mark.parametrize(
     "number, expected",
