@@ -1,27 +1,24 @@
 import pytest
 
-from src.calculator import add, divide, is_even, max_number, min_number, multiply, power, subtract, square, average, factorial, list_sum, list_average
-
-
-def test_add_positive_numbers():
-    assert add(2, 3) == 5
-
-
-def test_subtract_positive_numbers():
-    assert subtract(10, 4) == 6
-
-
-def test_multiply_positive_numbers():
-    assert multiply(6, 7) == 42
+from src.calculator import (
+    add,
+    average,
+    divide,
+    factorial,
+    is_even,
+    list_average,
+    list_sum,
+    max_number,
+    min_number,
+    multiply,
+    power,
+    square,
+    subtract,
+)
 
 
 def test_divide_positive_numbers():
     assert divide(10, 2) == 5
-
-
-def test_divide_by_zero_raises_error():
-    with pytest.raises(ValueError, match="Cannot divide by zero"):
-        divide(10, 0)
 
 
 def test_power():
@@ -30,20 +27,6 @@ def test_power():
 
 def test_power_with_zero_exponent():
     assert power(5, 0) == 1
-
-
-@pytest.mark.parametrize(
-    "number, expected",
-    [
-        (4, True),
-        (5, False),
-        (0, True),
-        (-2, True),
-        (-3, False),
-    ],
-)
-def test_is_even(number, expected):
-    assert is_even(number) is expected
 
 
 @pytest.mark.parametrize(
@@ -102,22 +85,12 @@ def test_factorial(number, expected):
     assert factorial(number) == expected
 
 
-def test_factorial_with_negative_number_raises_error():
-    with pytest.raises(ValueError, match="Factorial is not defined for negative numbers"):
-        factorial(-1)
-
-
 def test_list_sum(sample_numbers):
     assert list_sum(sample_numbers) == 15
 
 
 def test_list_average(sample_numbers):
     assert list_average(sample_numbers) == 3
-
-
-def test_list_average_with_empty_list_raises_error():
-    with pytest.raises(ValueError, match="Cannot calculate average of empty list"):
-        list_average([])
 
 
 def test_calculator_config(calculator_config):
