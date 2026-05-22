@@ -114,15 +114,10 @@ def test_multiply_positive_numbers():
 
 
 @pytest.mark.negative
-def test_divide_by_zero_raises_error():
+@pytest.mark.parametrize("number", [10, -10])
+def test_divide_by_zero_raises_error(number):
     with pytest.raises(ValueError, match="Cannot divide by zero"):
-        divide(10, 0)
-
-
-@pytest.mark.negative
-def test_divide_negative_number_by_zero_raises_error():
-    with pytest.raises(ValueError, match="Cannot divide by zero"):
-        divide(-10, 0)
+        divide(number, 0)
         
 
 @pytest.mark.negative
