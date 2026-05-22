@@ -127,17 +127,16 @@ def test_factorial_with_negative_number_raises_error():
 
 
 @pytest.mark.negative
-def test_list_average_with_empty_list_raises_error():
-    with pytest.raises(ValueError, match="Cannot calculate average of empty list"):
-        list_average([])
-
-
-@pytest.mark.negative
-def test_list_average_with_another_empty_list_raises_error():
-    empty_numbers = []
-
-    with pytest.raises(ValueError, match="Cannot calculate average of empty list"):
-        list_average(empty_numbers)
+@pytest.mark.parametrize(
+    "numbers, expected_error",
+    [
+        ([], "Cannot calculate average of empty list"),
+        (list(), "Cannot calculate average of empty list"),
+    ],
+)
+def test_list_average_with_empty_list_raises_error(numbers, expected_error):
+    with pytest.raises(ValueError, match=expected_error):
+        list_average(numbers)
         
         
 @pytest.mark.regression
