@@ -133,6 +133,7 @@ def test_factorial_with_negative_number_raises_error():
         ([], "Cannot calculate average of empty list"),
         (list(), "Cannot calculate average of empty list"),
     ],
+    ids=["empty-list-literal", "empty-list-constructor"],
 )
 def test_list_average_with_empty_list_raises_error(numbers, expected_error):
     with pytest.raises(ValueError, match=expected_error):
