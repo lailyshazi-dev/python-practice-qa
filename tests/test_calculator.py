@@ -21,6 +21,18 @@ def test_divide_positive_numbers():
     assert divide(10, 2) == 5
 
 
+@pytest.mark.parametrize(
+    "a, b, expected",
+    [
+        (1, 3, 0.3333333333),
+        (2, 3, 0.6666666667),
+    ],
+    ids=["one-divided-by-three", "two-divided-by-three"],
+)
+def test_divide_returns_approx_float_result(a, b, expected):
+    assert divide(a, b) == pytest.approx(expected)
+
+
 def test_power():
     assert power(2, 3) == 8
 
