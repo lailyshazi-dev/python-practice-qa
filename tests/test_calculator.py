@@ -33,6 +33,10 @@ def test_divide_returns_approx_float_result(a, b, expected):
     assert divide(a, b) == pytest.approx(expected)
 
 
+def test_average_returns_approx_result_with_tolerance():
+    assert average(1, 2) == pytest.approx(1.5, abs=0.01)
+
+
 def test_power():
     assert power(2, 3) == 8
 
