@@ -33,8 +33,17 @@ def test_divide_returns_approx_float_result(a, b, expected):
     assert divide(a, b) == pytest.approx(expected)
 
 
-def test_average_returns_approx_result_with_tolerance():
-    assert average(1, 2) == pytest.approx(1.5, abs=0.01)
+@pytest.mark.parametrize(
+    "a, b, expected",
+    [
+        (1, 2, 1.5),
+        (2, 5, 3.5),
+        (1, 3, 2.0),
+    ],
+    ids=["average-1-and-2", "average-2-and-5", "average-1-and-3"],
+)
+def test_average_returns_approx_result_with_tolerance(a, b, expected):
+    assert average(a, b) == pytest.approx(expected, abs=0.01)
 
 
 def test_power():
