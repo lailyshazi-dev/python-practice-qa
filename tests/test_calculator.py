@@ -36,11 +36,10 @@ def test_divide_returns_approx_float_result(a, b, expected):
 @pytest.mark.parametrize(
     "a, b, expected",
     [
-        (1, 2, 1.5),
-        (2, 5, 3.5),
-        (1, 3, 2.0),
+        pytest.param(1, 2, 1.5, id="average-1-and-2"),
+        pytest.param(2, 5, 3.5, id="average-2-and-5"),
+        pytest.param(1, 3, 2.0, id="average-1-and-3"),
     ],
-    ids=["average-1-and-2", "average-2-and-5", "average-1-and-3"],
 )
 def test_average_returns_approx_result_with_tolerance(a, b, expected):
     assert average(a, b) == pytest.approx(expected, abs=0.01)
