@@ -73,3 +73,7 @@ def percentage(part: int | float, total: int | float) -> float:
 
 def success_rate(successful: int | float, total: int | float) -> float:
     return percentage(successful, total)
+
+
+def failure_rate(failed: int | float, total: int | float) -> float:
+    return percentage(failed, total)
