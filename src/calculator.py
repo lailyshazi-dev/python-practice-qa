@@ -69,3 +69,7 @@ def percentage(part: int | float, total: int | float) -> float:
         raise ValueError("Cannot calculate percentage with zero total")
 
     return part / total * 100
+
+
+def success_rate(successful: int | float, total: int | float) -> float:
+    return percentage(successful, total)

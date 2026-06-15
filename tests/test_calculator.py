@@ -15,6 +15,7 @@ from src.calculator import (
     square,
     subtract,
     percentage,
+    success_rate,
 )
 
 
@@ -198,3 +199,19 @@ def test_is_even(number, expected):
     assert is_even(number) is expected
 
 
+@pytest.mark.parametrize(
+    "successful, total, expected",
+    [
+        pytest.param(8, 10, 80.0, id="eight-of-ten"),
+        pytest.param(64, 68, 94.1176470588, id="sixty-four-of-sixty-eight"),
+        pytest.param(0, 10, 0.0, id="zero-successful"),
+    ],
+)
+def test_success_rate_returns_expected_value(successful, total, expected):
+    assert success_rate(successful, total) == pytest.approx(expected, abs=0.01)
+
+
+@pytest.mark.negative
+def test_success_rate_with_zero_total_raises_error():
+    with pytest.raises(ValueError, match="Cannot calculate percentage with zero total"):
+        success_rate(10, 0)
