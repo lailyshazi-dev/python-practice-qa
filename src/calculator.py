@@ -62,3 +62,10 @@ def list_average(numbers: list[int | float]) -> float:
         raise ValueError("Cannot calculate average of empty list")
 
     return sum(numbers) / len(numbers)
+
+
+def percentage(part: int | float, total: int | float) -> float:
+    if total == 0:
+        raise ValueError("Cannot calculate percentage with zero total")
+
+    return part / total * 100

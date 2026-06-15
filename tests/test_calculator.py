@@ -14,6 +14,7 @@ from src.calculator import (
     power,
     square,
     subtract,
+    percentage,
 )
 
 
@@ -43,6 +44,24 @@ def test_divide_returns_approx_float_result(a, b, expected):
 )
 def test_average_returns_approx_result_with_tolerance(a, b, expected):
     assert average(a, b) == pytest.approx(expected, abs=0.01)
+
+
+@pytest.mark.parametrize(
+    "part, total, expected",
+    [
+        pytest.param(1, 2, 50.0, id="half"),
+        pytest.param(3, 4, 75.0, id="three-quarters"),
+        pytest.param(1, 3, 33.3333333333, id="one-third"),
+    ],
+)
+def test_percentage_returns_expected_value(part, total, expected):
+    assert percentage(part, total) == pytest.approx(expected, abs=0.01)
+
+
+@pytest.mark.negative
+def test_percentage_with_zero_total_raises_error():
+    with pytest.raises(ValueError, match="Cannot calculate percentage with zero total"):
+        percentage(10, 0)
 
 
 def test_power():
