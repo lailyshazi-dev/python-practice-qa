@@ -77,3 +77,16 @@ def success_rate(successful: int | float, total: int | float) -> float:
 
 def failure_rate(failed: int | float, total: int | float) -> float:
     return percentage(failed, total)
+
+
+def calculate_test_run_summary(passed: int, failed: int) -> dict[str, int | float]:
+    total = passed + failed
+
+    if total == 0:
+        raise ValueError("Cannot calculate test run summary with zero total")
+
+    return {
+        "total": total,
+        "success_rate": success_rate(passed, total),
+        "failure_rate": failure_rate(failed, total),
+    }

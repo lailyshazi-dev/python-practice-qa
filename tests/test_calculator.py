@@ -17,6 +17,7 @@ from src.calculator import (
     percentage,
     success_rate,
     failure_rate,
+    calculate_test_run_summary,
 )
 
 
@@ -234,3 +235,31 @@ def test_failure_rate_returns_expected_value(failed, total, expected):
 def test_failure_rate_with_zero_total_raises_error():
     with pytest.raises(ValueError, match="Cannot calculate percentage with zero total"):
         failure_rate(1, 0)
+
+
+@pytest.mark.parametrize(
+    "passed, failed, expected_total, expected_success_rate, expected_failure_rate",
+    [
+        pytest.param(8, 2, 10, 80.0, 20.0, id="mostly-passed"),
+        pytest.param(64, 4, 68, 94.1176470588, 5.8823529412, id="real-project-example"),
+        pytest.param(0, 10, 10, 0.0, 100.0, id="all-failed"),
+    ],
+)
+def test_test_run_summary_returns_expected_data(
+    passed,
+    failed,
+    expected_total,
+    expected_success_rate,
+    expected_failure_rate,
+):
+    summary = calculate_test_run_summary(passed, failed)
+
+    assert summary["total"] == expected_total
+    assert summary["success_rate"] == pytest.approx(expected_success_rate, abs=0.01)
+    assert summary["failure_rate"] == pytest.approx(expected_failure_rate, abs=0.01)
+
+
+@pytest.mark.negative
+def test_test_run_summary_with_zero_total_raises_error():
+    with pytest.raises(ValueError, match="Cannot calculate test run summary with zero total"):
+        calculate_test_run_summary(0, 0)
