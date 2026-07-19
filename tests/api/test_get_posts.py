@@ -102,3 +102,24 @@ def test_get_posts_response_time_is_within_timeout(api_client):
         f"Expected response time less than {api_client.timeout} seconds, "
         f"got {response.elapsed.total_seconds():.2f} seconds"
     )
+
+
+@pytest.mark.parametrize(
+    "user_id",
+    [
+        pytest.param(1, id="first-user"),
+        pytest.param(5, id="middle-user"),
+        pytest.param(10, id="last-user"),
+    ],
+)
+def test_get_posts_by_user_returns_only_requested_user(api_client, user_id):
+    response = api_client.get_posts_by_user(user_id)
+    data = response.json()
+
+    assert response.status_code == 200, (
+        f"Expected status code 200, got {response.status_code}"
+    )
+    assert len(data) > 0, f"Expected posts for user {user_id}"
+    assert all(post["userId"] == user_id for post in data), (
+        f"Expected only posts for user {user_id}, got {data}"
+    )

@@ -6,14 +6,21 @@ class ApiClient:
         self.base_url = base_url
         self.timeout = timeout
 
-    def get(self, path: str):
-        return requests.get(f"{self.base_url}{path}", timeout=self.timeout)
+    def get(self, path: str, params: dict | None = None):
+        return requests.get(
+            f"{self.base_url}{path}",
+            params=params,
+            timeout=self.timeout,
+        )
 
     def get_post(self, post_id: int):
         return self.get(f"/posts/{post_id}")
 
     def get_posts(self):
         return self.get("/posts")
+
+    def get_posts_by_user(self, user_id: int):
+        return self.get("/posts", params={"userId": user_id})
 
     def post(self, path: str, json: dict):
         return requests.post(f"{self.base_url}{path}", json=json, timeout=self.timeout)
