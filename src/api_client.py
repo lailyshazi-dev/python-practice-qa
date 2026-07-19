@@ -22,6 +22,12 @@ class ApiClient:
     def get_posts_by_user(self, user_id: int):
         return self.get("/posts", params={"userId": user_id})
 
+    def get_posts_page(self, page: int, limit: int):
+        return self.get(
+            "/posts",
+            params={"_page": page, "_limit": limit},
+        )
+
     def post(self, path: str, json: dict):
         return requests.post(f"{self.base_url}{path}", json=json, timeout=self.timeout)
 

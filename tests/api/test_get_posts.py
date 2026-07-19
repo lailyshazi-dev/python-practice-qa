@@ -123,3 +123,34 @@ def test_get_posts_by_user_returns_only_requested_user(api_client, user_id):
     assert all(post["userId"] == user_id for post in data), (
         f"Expected only posts for user {user_id}, got {data}"
     )
+
+
+@pytest.mark.parametrize(
+    "page, limit, expected_first_id",
+    [
+        pytest.param(1, 5, 1, id="first-page"),
+        pytest.param(2, 5, 6, id="second-page"),
+        pytest.param(4, 10, 31, id="fourth-page"),
+    ],
+)
+def test_get_posts_page_returns_expected_items(
+    api_client,
+    page,
+    limit,
+    expected_first_id,
+):
+    response = api_client.get_posts_page(page, limit)
+    data = response.json()
+
+    assert response.status_code == 200
+    assert len(data) == limit
+    assert data[0]["id"] == expected_first_id
+
+
+@pytest.mark.negative
+def test_get_posts_page_out_of_range_returns_empty_list(api_client):
+    response = api_client.get_posts_page(page=100, limit=10)
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data == []
