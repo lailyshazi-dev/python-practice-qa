@@ -57,3 +57,6 @@ class ApiClient:
 
     def delete_post(self, post_id: int):
         return self.delete(f"/posts/{post_id}")
+
+    def close(self):
+        self.session.close()

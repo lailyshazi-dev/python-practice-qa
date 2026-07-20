@@ -5,7 +5,11 @@ from src.api_client import ApiClient
 
 @pytest.fixture(scope="module")
 def api_client():
-    return ApiClient("https://jsonplaceholder.typicode.com")
+    client = ApiClient("https://jsonplaceholder.typicode.com")
+
+    yield client
+
+    client.close()
 
 
 @pytest.fixture
