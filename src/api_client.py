@@ -2,7 +2,12 @@ import requests
 
 
 class ApiClient:
-    def __init__(self, base_url: str, timeout: int = 10):
+    def __init__(
+        self,
+        base_url: str,
+        timeout: int = 10,
+        token: str | None = None,
+    ):
         self.base_url = base_url
         self.timeout = timeout
         self.session = requests.Session()
@@ -11,6 +16,13 @@ class ApiClient:
                 "Accept": "application/json",
             }
         )
+
+        if token:
+            self.session.headers.update(
+                {
+                    "Authorization": f"Bearer {token}",
+                }
+            )
 
     def get(self, path: str, params: dict | None = None):
         return self.session.get(

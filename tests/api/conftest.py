@@ -13,6 +13,18 @@ def api_client():
 
 
 @pytest.fixture
+def authorized_api_client():
+    client = ApiClient(
+        "https://example.com",
+        token="test-token",
+    )
+
+    yield client
+
+    client.close()
+
+
+@pytest.fixture
 def new_post_payload():
     return {
         "title": "Test title",

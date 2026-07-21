@@ -26,3 +26,14 @@ def test_api_client_close_calls_session_close(api_client, monkeypatch):
     api_client.close()
 
     assert close_calls == ["closed"]
+
+
+def test_api_client_adds_bearer_token_header(authorized_api_client):
+    assert (
+        authorized_api_client.session.headers["Authorization"]
+        == "Bearer test-token"
+    )
+
+
+def test_api_client_without_token_has_no_authorization_header(api_client):
+    assert "Authorization" not in api_client.session.headers
