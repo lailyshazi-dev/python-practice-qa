@@ -1,6 +1,7 @@
 import pytest
 
 from src.api_client import ApiClient
+from src.config import get_api_token
 
 
 @pytest.fixture(scope="module")
@@ -13,10 +14,12 @@ def api_client():
 
 
 @pytest.fixture
-def authorized_api_client():
+def authorized_api_client(monkeypatch):
+    monkeypatch.setenv("API_TOKEN", "test-token")
+
     client = ApiClient(
         "https://example.com",
-        token="test-token",
+        token=get_api_token(),
     )
 
     yield client
