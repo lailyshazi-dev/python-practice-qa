@@ -1,12 +1,12 @@
 import pytest
 
 from src.api_client import ApiClient
-from src.config import get_api_token
+from src.config import get_api_base_url, get_api_token
 
 
 @pytest.fixture(scope="module")
 def api_client():
-    client = ApiClient("https://jsonplaceholder.typicode.com")
+    client = ApiClient(get_api_base_url())
 
     yield client
 
