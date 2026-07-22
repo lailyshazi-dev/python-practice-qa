@@ -37,3 +37,58 @@ def test_api_client_adds_bearer_token_header(authorized_api_client):
 
 def test_api_client_without_token_has_no_authorization_header(api_client):
     assert "Authorization" not in api_client.session.headers
+
+
+def test_get_sends_expected_request(api_client, monkeypatch):
+    captured_request = {}
+    expected_response = object()
+
+    def fake_get(url, params, timeout):
+        captured_request.update(
+            {
+                "url": url,
+                "params": params,
+                "timeout": timeout,
+            }
+        )
+        return expected_response
+
+    monkeypatch.setattr(api_client.session, "get", fake_get)
+
+    response = api_client.get(
+        "/posts",
+        params={"userId": 1},
+    )
+
+    assert response is expected_response
+    assert captured_request == {
+        "url": f"{api_client.base_url}/posts",
+        "params": {"userId": 1},
+        "timeout": api_client.timeout,
+    }
+
+
+def test_get_post_uses_expected_path(api_client, monkeypatch):
+    captured_calls = []
+    expected_response = object()
+
+    def fake_get(path, params=None):
+        captured_calls.append(
+            {
+                "path": path,
+                "params": params,
+            }
+        )
+        return expected_response
+
+    monkeypatch.setattr(api_client, "get", fake_get)
+
+    response = api_client.get_post(7)
+
+    assert response is expected_response
+    assert captured_calls == [
+        {
+            "path": "/posts/7",
+            "params": None,
+        }
+    ]
