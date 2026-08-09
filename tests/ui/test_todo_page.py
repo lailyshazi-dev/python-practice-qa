@@ -1,4 +1,6 @@
 import pytest
+from playwright.sync_api import expect
+
 from tests.ui.pages.todo_page import TodoPage
 
 
