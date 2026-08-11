@@ -69,3 +69,30 @@ def test_user_can_filter_completed_todos(
     expect(
         todo_page.todo_item(active_title)
     ).to_be_hidden()
+
+
+@pytest.mark.parametrize(
+    "title, expected_count",
+    [
+        pytest.param(
+            "Buy milk",
+            1,
+            id="valid-title",
+        ),
+        pytest.param(
+            "",
+            0,
+            id="empty-title",
+        ),
+    ],
+)
+def test_add_todo_result(
+    todo_page: TodoPage,
+    title: str,
+    expected_count: int,
+):
+    todo_page.add_todo(title)
+
+    expect(todo_page.todo_items).to_have_count(
+        expected_count
+    )
