@@ -7,13 +7,25 @@ from tests.ui.pages.todo_page import TodoPage
 pytestmark = pytest.mark.ui
 
 
-def test_user_can_add_todo(todo_page: TodoPage):
-    todo_page.add_todo("Learn Playwright locators")
+@pytest.mark.parametrize(
+    "title",
+    [
+        "Learn Playwright locators",
+        "Practice UI assertions",
+    ],
+    ids=[
+        "locators",
+        "assertions",
+    ],
+)
+def test_user_can_add_todo(
+    todo_page: TodoPage,
+    title: str,
+):
+    todo_page.add_todo(title)
 
     expect(
-        todo_page.todo_title(
-            "Learn Playwright locators"
-        )
+        todo_page.todo_title(title)
     ).to_be_visible()
     expect(todo_page.todo_items).to_have_count(1)
     expect(todo_page.items_left(1)).to_be_visible()
