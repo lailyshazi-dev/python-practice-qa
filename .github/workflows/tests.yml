@@ -5,6 +5,20 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Test suite to run
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - smoke
+          - regression
+          - ui
+  schedule:
+    - cron: "0 3 * * 1"
 
 permissions:
   contents: read
@@ -55,6 +69,7 @@ jobs:
   regression:
     name: Regression tests
     needs: smoke
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.suite == 'all' || inputs.suite == 'regression' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -94,6 +109,7 @@ jobs:
   ui_matrix:
     name: UI tests (${{ matrix.browser }})
     needs: smoke
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.suite == 'all' || inputs.suite == 'ui' }}
     strategy:
       fail-fast: false
       matrix:
@@ -159,24 +175,28 @@ jobs:
           path: collected-artifacts/smoke
 
       - name: Download regression artifacts
+        if: ${{ needs.regression.result == 'success' }}
         uses: actions/download-artifact@v5
         with:
           name: regression-test-artifacts
           path: collected-artifacts/regression
 
       - name: Download Chromium artifacts
+        if: ${{ needs.ui_matrix.result == 'success' }}
         uses: actions/download-artifact@v5
         with:
           name: ui-chromium-test-artifacts
           path: collected-artifacts/ui/chromium
 
       - name: Download Firefox artifacts
+        if: ${{ needs.ui_matrix.result == 'success' }}
         uses: actions/download-artifact@v5
         with:
           name: ui-firefox-test-artifacts
           path: collected-artifacts/ui/firefox
 
       - name: Download WebKit artifacts
+        if: ${{ needs.ui_matrix.result == 'success' }}
         uses: actions/download-artifact@v5
         with:
           name: ui-webkit-test-artifacts
