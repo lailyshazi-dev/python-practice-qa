@@ -73,10 +73,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Install Playwright browsers
-        run: |
-          python -m playwright install --with-deps chromium
-
       - name: Run regression tests
         run: |
           python -m pytest -m "not smoke" \
@@ -95,11 +91,63 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+    ui_matrix:
+    name: UI tests (${{ matrix.browser }})
+    needs: smoke
+    strategy:
+      fail-fast: false
+      matrix:
+        browser:
+          - chromium
+          - firefox
+          - webkit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Install Playwright browser
+        run: |
+          python -m playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run UI tests
+        run: |
+          python -m pytest -m ui \
+            --browser ${{ matrix.browser }} \
+            --html=reports/ui-${{ matrix.browser }}-report.html \
+            --self-contained-html \
+            --junitxml=reports/ui-${{ matrix.browser }}-junit.xml
+
+      - name: Upload UI artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: ui-${{ matrix.browser }}-test-artifacts
+          path: |
+            reports/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
   report:
     name: Collect test reports
     needs:
       - smoke
       - regression
+      -ui_matrix
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -115,6 +163,24 @@ jobs:
         with:
           name: regression-test-artifacts
           path: collected-artifacts/regression
+
+            - name: Download Chromium artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: ui-chromium-test-artifacts
+          path: collected-artifacts/ui/chromium
+
+      - name: Download Firefox artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: ui-firefox-test-artifacts
+          path: collected-artifacts/ui/firefox
+
+      - name: Download WebKit artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: ui-webkit-test-artifacts
+          path: collected-artifacts/ui/webkit
 
       - name: Show collected files
         run: |
