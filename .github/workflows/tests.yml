@@ -57,7 +57,7 @@ jobs:
 
       - name: Upload smoke artifacts
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: smoke-test-artifacts
           path: |
@@ -97,7 +97,7 @@ jobs:
 
       - name: Upload regression artifacts
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: regression-test-artifacts
           path: |
@@ -149,7 +149,7 @@ jobs:
 
       - name: Upload UI artifacts
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ui-${{ matrix.browser }}-test-artifacts
           path: |
@@ -170,35 +170,35 @@ jobs:
 
     steps:
       - name: Download smoke artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: smoke-test-artifacts
           path: collected-artifacts/smoke
 
       - name: Download regression artifacts
         if: ${{ needs.regression.result == 'success' }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: regression-test-artifacts
           path: collected-artifacts/regression
 
       - name: Download Chromium artifacts
         if: ${{ needs.ui_matrix.result == 'success' }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: ui-chromium-test-artifacts
           path: collected-artifacts/ui/chromium
 
       - name: Download Firefox artifacts
         if: ${{ needs.ui_matrix.result == 'success' }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: ui-firefox-test-artifacts
           path: collected-artifacts/ui/firefox
 
       - name: Download WebKit artifacts
         if: ${{ needs.ui_matrix.result == 'success' }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: ui-webkit-test-artifacts
           path: collected-artifacts/ui/webkit
@@ -208,7 +208,7 @@ jobs:
           find collected-artifacts -type f -print
 
       - name: Upload combined artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: combined-test-artifacts
           path: collected-artifacts/
