@@ -33,12 +33,12 @@ jobs:
         run: |
           python -m playwright install --with-deps chromium
 
-        - name: Run smoke tests
-          run: |
-            python -m pytest -m smoke \
-                --html=reports/smoke-report.html \
-                --self-contained-html \
-                --junitxml=reports/smoke-junit.xml
+      - name: Run smoke tests
+        run: |
+          python -m pytest -m smoke \
+            --html=reports/smoke-report.html \
+            --self-contained-html \
+            --junitxml=reports/smoke-junit.xml
 
       - name: Run full test suite
         run: |
