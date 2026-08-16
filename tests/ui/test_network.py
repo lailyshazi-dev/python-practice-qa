@@ -5,6 +5,7 @@ from playwright.sync_api import Page, expect
 pytestmark = pytest.mark.ui
 
 
+@pytest.mark.smoke
 def test_todomvc_initial_document_returns_ok(
     page: Page,
     base_url: str,

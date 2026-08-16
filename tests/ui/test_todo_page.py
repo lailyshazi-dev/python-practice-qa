@@ -18,6 +18,7 @@ pytestmark = pytest.mark.ui
         "assertions",
     ],
 )
+@pytest.mark.smoke
 def test_user_can_add_todo(
     todo_page: TodoPage,
     title: str,
