@@ -37,7 +37,8 @@ jobs:
         run: |
           python -m pytest \
             --html=reports/report.html \
-            --self-contained-html
+            --self-contained-html \
+            --junitxml=reports/junit.xml
 
       - name: Upload test artifacts
         if: ${{ !cancelled() }}
