@@ -95,7 +95,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-    report:
+  report:
     name: Collect test reports
     needs:
       - smoke
