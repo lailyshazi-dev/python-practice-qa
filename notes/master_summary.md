@@ -1,6 +1,6 @@
-# Большой конспект: Python, pytest, Git и GitHub
+# Большой конспект: Junior QA Automation
 
-Этот конспект - главная карта обучения. Его можно переписывать в тетрадь и продолжать дополнять после каждого нового урока.
+Этот конспект - главная карта обучения Python, pytest, API, Playwright, Git и CI/CD. Он собран по материалам уроков 1-82 и предназначен для повторения и переписывания в тетрадь.
 
 ## 1. Общая цель обучения
 
@@ -19,31 +19,55 @@
 
 ```text
 python-practice-qa/
+  .github/
+    workflows/
+      tests.yml
+    dependabot.yml
   README.md
   pytest.ini
   requirements.txt
   src/
     api_client.py
     calculator.py
+    config.py
   tests/
+    api/
+      conftest.py
+      test_api_client.py
+      test_create_post.py
+      test_delete_post.py
+      test_get_posts.py
+      test_update_post.py
+    ui/
+      pages/
+        todo_page.py
+      conftest.py
+      test_example_page.py
+      test_network.py
+      test_network_mock.py
+      test_todo_page.py
     conftest.py
-    test_api_posts.py
     test_calculator.py
+    test_config.py
   notes/
     day_01.md
     ...
+    day_82.md
     master_summary.md
 ```
 
 Что где лежит:
 
 - `src/` - код, который мы тестируем: функции и API-клиент.
-- `tests/` - автотесты.
+- `tests/api/` - API-тесты и локальные API-фикстуры.
+- `tests/ui/` - UI-тесты Playwright и Page Object.
 - `tests/conftest.py` - общие фикстуры pytest.
 - `notes/` - учебные конспекты.
 - `README.md` - описание проекта для GitHub.
 - `pytest.ini` - настройки pytest.
 - `requirements.txt` - зависимости проекта.
+- `.github/workflows/tests.yml` - CI pipeline GitHub Actions.
+- `.github/dependabot.yml` - автоматический поиск обновлений GitHub Actions.
 
 ## 3. API: главная идея
 
@@ -861,22 +885,34 @@ flowchart TD
 - Сводка тестового прогона в виде словаря.
 - API-фильтрация через query parameters.
 - Проверка всех элементов ответа через `all(...)`.
-- Всего `83` автотеста: `57` calculator и `26` API.
+- API-пагинация и несколько query parameters.
+- `requests.Session`, общие headers и закрытие соединений.
+- Bearer token и настройки из переменных окружения.
+- Unit-тест HTTP-вызова через `monkeypatch` без реального интернета.
+- UI-тесты Playwright для TodoMVC.
+- Web-first assertions и устойчивые locators.
+- Локальная UI-фикстура и Page Object Model.
+- Параметризованные позитивные и негативные UI-сценарии.
+- Playwright trace, screenshots и network inspection.
+- Перехват и mock сетевых запросов через `page.route`.
+- GitHub Actions для push, Pull Request, ручного и планового запуска.
+- Отдельные smoke, regression и browser matrix jobs.
+- HTML- и JUnit-отчёты, Playwright artifacts.
+- Dependabot и практика review dependency Pull Requests.
+- Всего `111` собранных pytest-сценариев: `57` calculator, `37` API, `4` config и `13` UI.
 
 ## 28. Следующие темы
 
 Дальше добавляем:
 
-- несколько query parameters в одном запросе;
-- пагинацию и проверку границ страниц;
-- `requests.Session` и общие headers;
-- авторизацию и проверку токенов на учебном API;
-- mock и monkeypatch для независимых API-тестов;
-- первый проект на Playwright;
-- Selenium и сравнение с Playwright;
-- Page Object Model;
-- GitHub Actions;
-- резюме и описание проектов.
+- Selenium WebDriver и сравнение его ожиданий с Playwright;
+- Selenium Page Object и кросс-браузерный запуск;
+- SQL для проверки данных на уровне базы;
+- Docker для одинакового локального и CI-окружения;
+- более реалистичный API с авторизацией и созданием тестовых данных;
+- собственный портфельный проект вместо одного демонстрационного сайта;
+- тест-дизайн, баг-репорты и тестовую документацию;
+- подготовку резюме, GitHub-профиля и ответов для собеседований.
 
 ## 29. Контрольная точка: уроки 32-54
 
@@ -932,3 +968,336 @@ flowchart TD
 4. Наставник проверяет diff и автоматически сохраняет конспект.
 5. После кода разбирается один вопрос собеседования в приватном файле.
 6. Ветка коммитится, объединяется с `master` и отправляется на GitHub.
+
+## 30. Контрольная точка: уроки 55-61
+
+### API-пагинация
+
+Пагинация делит большой ответ на страницы. Номер страницы и размер передаются как query parameters:
+
+```python
+params = {
+    "_page": page,
+    "_limit": limit,
+}
+```
+
+Тест пагинации проверяет не только `200`, но и:
+
+- количество элементов;
+- первый и последний объект;
+- правильный порядок;
+- пустой результат после последней страницы;
+- граничные значения `page` и `limit`.
+
+Реальный пример: каталог содержит миллион товаров. Клиент запрашивает по 20 товаров, а тест проверяет, что страницы не пропускают и не дублируют позиции.
+
+### `requests.Session`
+
+Session хранит общие настройки и переиспользует соединения:
+
+```python
+self.session = requests.Session()
+self.session.headers.update(
+    {"Accept": "application/json"}
+)
+```
+
+В одном месте можно настроить общие headers, cookies и авторизацию. После API-авторизации session может хранить cookie, чтобы следующие запросы к профилю и заказам выполнялись от имени того же пользователя.
+
+### Setup и teardown
+
+Fixture с `yield` выполняет подготовку до теста и очистку после него:
+
+```python
+@pytest.fixture
+def api_client():
+    client = ApiClient(base_url)
+    yield client
+    client.close()
+```
+
+Очистка нужна для закрытия session, браузера, подключения к базе, временных файлов и созданных тестовых данных. Она должна выполняться даже после падения теста.
+
+### Bearer token
+
+Token передаётся в header:
+
+```text
+Authorization: Bearer <token>
+```
+
+Настоящие token, пароль и API key нельзя хранить в коде или Git. Они передаются через environment variables или CI secrets.
+
+Разница статусов:
+
+- `401 Unauthorized` - пользователь не прошёл аутентификацию;
+- `403 Forbidden` - пользователь известен, но у него нет нужного разрешения.
+
+Реальный пример: обычный пользователь получает `403` при попытке удалить чужой заказ, а администратор получает успешный ответ.
+
+### Переменные окружения
+
+```python
+api_token = os.getenv("API_TOKEN")
+base_url = os.getenv("API_BASE_URL", default_url)
+```
+
+Один код можно запускать на `dev`, `stage` и другом стенде без изменения исходных файлов. В тестах `monkeypatch.setenv()` создаёт контролируемое значение и не зависит от настроек компьютера.
+
+### Unit-тест внешнего вызова
+
+`monkeypatch` позволяет заменить реальный HTTP-метод тестовым double. Такой unit-тест:
+
+- не зависит от интернета;
+- работает быстро;
+- проверяет точные аргументы вызова;
+- воспроизводит нужный ответ или исключение.
+
+Integration-тест с реальным API всё равно нужен, но решает другую задачу: проверяет настоящее взаимодействие компонентов.
+
+## 31. Контрольная точка: уроки 62-73
+
+### Playwright и первый UI-тест
+
+Playwright управляет браузером и проверяет приложение с точки зрения пользователя. Типовой сценарий:
+
+```python
+page.goto(base_url)
+page.get_by_placeholder("What needs to be done?").fill(title)
+page.get_by_placeholder("What needs to be done?").press("Enter")
+expect(page.get_by_text(title, exact=True)).to_be_visible()
+```
+
+UI-тест проверяет браузер, DOM, JavaScript и пользовательское взаимодействие. Он ближе к реальному сценарию, но обычно медленнее unit- и API-теста.
+
+### Locators
+
+Предпочтительный порядок локаторов:
+
+1. Role и доступное имя.
+2. Label или placeholder поля.
+3. Стабильный `data-testid`.
+4. Короткий устойчивый CSS locator.
+
+Нужно избегать длинных CSS/XPath-цепочек, зависящих от случайной вложенности и оформления.
+
+### Web-first assertions
+
+```python
+expect(locator).to_be_visible()
+expect(locator).to_be_checked()
+expect(locator).to_have_count(2)
+```
+
+Playwright повторяет такую проверку до выполнения условия или timeout. Это устойчивее немедленного `assert` и искусственного `sleep`.
+
+Реальный пример: кнопка появляется после ответа API. Web-first assertion ждёт именно видимость кнопки, а `sleep(5)` всегда теряет пять секунд и всё равно может оказаться недостаточным.
+
+### Изоляция тестов
+
+Fixture `page` создаёт для каждого теста новый browser context. Cookies, local storage и состояние одного теста не должны влиять на другой.
+
+Изоляция важна, потому что тесты могут выполняться в другом порядке, запускаться отдельно, работать параллельно или падать до очистки состояния.
+
+### Base URL и локальный `conftest.py`
+
+`base_url` хранится в `pytest.ini`, а UI-фикстуры находятся в `tests/ui/conftest.py`. Они доступны только UI-поддереву и не засоряют API- или calculator-тесты.
+
+### Page Object Model
+
+Page Object хранит локаторы и действия страницы:
+
+```python
+class TodoPage:
+    def add_todo(self, title: str) -> None:
+        self.todo_input.fill(title)
+        self.todo_input.press("Enter")
+```
+
+Тест хранит сценарий и проверки:
+
+```python
+todo_page.add_todo(title)
+expect(todo_page.todo_title(title)).to_be_visible()
+```
+
+Если locator меняется, его исправляют в одном Page Object, а не во всех тестах. При этом Page Object не должен превращаться в огромный класс, который скрывает смысл теста.
+
+### Параметризация UI
+
+`pytest.mark.parametrize` позволяет одним сценарием проверить разные данные. `pytest.param(..., id="...")` даёт понятное имя в отчёте и может назначить отдельному набору marker.
+
+Реальный пример: форма регистрации проверяется с латиницей, кириллицей, пробелами, минимальной и максимальной длиной. Логика одна, меняются вход и ожидаемый результат.
+
+### Trace, screenshot и video
+
+При падении UI-теста важны диагностические artifacts:
+
+- traceback показывает строку ошибки;
+- screenshot показывает последний видимый экран;
+- video показывает последовательность действий;
+- trace содержит DOM, locator, действия, сеть и временную шкалу.
+
+Trace особенно полезен, когда тест падает только в CI и ошибку невозможно сразу повторить локально.
+
+### UI и network
+
+Действие в UI не всегда вызывает запрос к backend. Например, TodoMVC хранит данные в браузере, поэтому добавление задачи не отправляет `POST` на сервер.
+
+Чтобы проверить конкретный ответ браузера:
+
+```python
+with page.expect_response(url_pattern) as response_info:
+    page.goto(url)
+
+response = response_info.value
+assert response.ok
+```
+
+### Network mock
+
+`page.route()` перехватывает запрос и возвращает контролируемый ответ:
+
+```python
+page.route(
+    "**/api/data",
+    lambda route: route.fulfill(
+        status=200,
+        content_type="application/json",
+        body='{"result": "ok"}',
+    ),
+)
+```
+
+Mock нужен, чтобы воспроизвести редкие ошибки, проверить UI до готовности backend или убрать нестабильную внешнюю зависимость. Но mock не заменяет integration- и end-to-end-тесты реального соединения.
+
+Реальный пример: с помощью mock проверяются ответы `200`, `404` и `500`, а также сообщение об ошибке на странице. Для настоящей совместимости контракта отдельно запускается тест с реальным API.
+
+## 32. Контрольная точка: уроки 74-82
+
+### CI и GitHub Actions
+
+Continuous Integration автоматически проверяет изменения после push или открытия Pull Request. Workflow проекта выполняет:
+
+```text
+checkout repository
+setup Python
+install dependencies
+install browser
+run pytest
+upload reports and traces
+```
+
+CI даёт одинаковое чистое окружение и ранний сигнал о регрессии. Зелёный pipeline подтверждает только реализованные проверки и не доказывает полное отсутствие дефектов.
+
+### HTML и JUnit
+
+- HTML-отчёт удобен человеку для просмотра результатов.
+- JUnit XML читают CI-системы и инструменты аналитики.
+- Trace, screenshot и video нужны для диагностики UI-падений.
+
+При расследовании сначала определяется failed job и step, затем изучаются лог, traceback и artifacts.
+
+### Smoke и regression
+
+Smoke - маленький набор критических сценариев, подтверждающий пригодность сборки. Regression - широкий набор проверок ранее работавшей функциональности.
+
+```powershell
+pytest -m smoke
+pytest -m "not smoke and not ui"
+```
+
+Реальный пример: smoke проверяет открытие сайта, авторизацию и создание заказа. После него регрессия проверяет фильтры, промокоды, роли, способы оплаты и ошибки API.
+
+### Jobs, steps и `needs`
+
+- Steps одного job выполняются на одном runner и разделяют файлы.
+- Jobs обычно запускаются на отдельных изолированных runner.
+- `needs` задаёт порядок и зависимость статусов.
+- `needs` не передаёт файлы между jobs.
+
+Для передачи файлов первый job использует `upload-artifact`, а другой - `download-artifact`.
+
+### Artifact и cache
+
+Artifact - результат конкретного запуска: отчёт, trace, screenshot или сборка. Cache ускоряет будущие запуски, например повторную установку pip-зависимостей.
+
+Удаление cache не должно ломать pipeline: запуск станет медленнее, но останется корректным. Artifact нужен как доказательство и материал для анализа конкретного run.
+
+### Browser matrix
+
+Matrix запускает один шаблон job с разными параметрами:
+
+```yaml
+matrix:
+  browser:
+    - chromium
+    - firefox
+    - webkit
+```
+
+`fail-fast: false` позволяет всем браузерам завершить работу, даже если один вариант упал. Так команда получает полную картину совместимости.
+
+### События workflow
+
+- `push` - проверка изменений в ветке после отправки.
+- `pull_request` - проверка кандидата на merge.
+- `workflow_dispatch` - ручной запуск с выбором набора.
+- `schedule` - запуск по UTC cron-расписанию.
+
+Conditions в jobs позволяют при ручном запуске выбрать только smoke, regression или UI. Collector учитывает `skipped` jobs и скачивает только существующие artifacts.
+
+### Dependabot
+
+Dependabot регулярно проверяет версии GitHub Actions и создаёт отдельные Pull Requests. Он автоматизирует обнаружение обновления, но не принимает решение за команду.
+
+Перед merge dependency PR нужно:
+
+1. Проверить автора и источник.
+2. Изучить точный diff.
+3. Прочитать release notes и breaking changes.
+4. Найти использование изменённых функций в проекте.
+5. Проверить обязательные CI jobs.
+6. После merge проверить новый run основной ветки.
+7. Убедиться, что созданы ожидаемые artifacts.
+
+Major tag удобен для получения совместимых обновлений внутри major-ветки. Полный commit SHA неизменяем и даёт более строгий supply-chain контроль. `@main` и `@latest` нельзя использовать без особой причины и review.
+
+### Текущий pipeline
+
+```text
+Smoke tests
+     |
+     +--> Regression tests
+     |
+     +--> UI Chromium
+     +--> UI Firefox
+     +--> UI WebKit
+              |
+              v
+     Collect test reports
+```
+
+Последняя проверка после обновления GitHub Actions завершилась успешно и создала шесть artifacts: smoke, regression, три браузерных и общий архив.
+
+## 33. Текущая контрольная точка
+
+На момент завершения урока 82 pytest собирает:
+
+```text
+57 calculator scenarios
+37 API scenarios
+4 config scenarios
+13 Playwright UI scenarios
+111 scenarios total
+```
+
+Уже отработаны четыре уровня автоматизации:
+
+- unit-тесты функций;
+- API-тесты HTTP-клиента;
+- UI-тесты пользовательских сценариев;
+- CI-проверки всего проекта в чистом окружении.
+
+Следующая практическая цель - добавить Selenium в отдельную папку, создать WebDriver fixture, изучить явные ожидания и сравнить Selenium с автоматическими ожиданиями Playwright.
