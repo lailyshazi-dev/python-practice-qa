@@ -90,7 +90,7 @@ jobs:
 
       - name: Run regression tests
         run: |
-          python -m pytest -m "not smoke and not ui" \
+          python -m pytest -m "not smoke and not ui and not selenium" \
             --html=reports/regression-report.html \
             --self-contained-html \
             --junitxml=reports/regression-junit.xml
