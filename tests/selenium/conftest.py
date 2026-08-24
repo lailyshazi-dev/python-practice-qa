@@ -2,6 +2,9 @@ import os
 
 import pytest
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+
+EXPLICIT_TIMEOUT = 10
 
 
 @pytest.fixture
@@ -17,3 +20,8 @@ def selenium_driver():
     yield driver
 
     driver.quit()
+
+
+@pytest.fixture
+def wait(selenium_driver):
+    return WebDriverWait(selenium_driver, EXPLICIT_TIMEOUT)
