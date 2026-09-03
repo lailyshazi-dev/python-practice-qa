@@ -10,7 +10,6 @@
 
 - day_83: фикстура `selenium_driver`, явные ожидания.
 - day_84: константы-локаторы, фикстура `wait`, сообщения в `until()`.
-- Уже есть образец: `tests/ui/pages/todo_page.py` — Page Object для Playwright.
 
 ## Ход
 
@@ -49,7 +48,7 @@ class SeleniumTodoPage:
         return self.driver.find_elements(*self.TODO_ITEM)
 ```
 
-Ещё четыре метода по той же схеме: `first_todo_title`, `complete_first_todo` (ждёт presence — см. day_84, opacity 0), `clear_completed`, `wait_list_empty`. Локаторы — атрибуты класса, `wait` и `driver` приходят один раз в конструктор: каждый метод берёт их из `self`, а не тащит параметрами.
+Ещё четыре метода по той же схеме: `first_todo_title`, `complete_first_todo` (ждёт presence — day_84), `clear_completed`, `wait_list_empty`. `wait` и `driver` приходят один раз в конструктор, методы берут их из `self`.
 
 **Шаг 2. Фикстура.** В `tests/selenium/conftest.py`:
 
@@ -74,8 +73,6 @@ def test_user_can_complete_and_clear_todo(todo_page, base_url):
     todo_page.wait_list_empty()
     assert todo_page.visible_todos() == []
 ```
-
-`pytestmark` на уровне модуля — один маркер на все тесты файла.
 
 **Шаг 4. Запуск.** Предскажи итог: `pytest -m selenium` → `2 passed, 111 deselected` (113 тестов в проекте). Увидели: так и есть, 22 с.
 
@@ -120,9 +117,7 @@ D85 · 02.09 · Page Object для Selenium
 
 1. Зачем `wait` передаётся в конструктор один раз, а не в каждый метод?
    <details>Страница владеет своим ожиданием: один таймаут для всех действий, методы короче, тест не знает про WebDriverWait вообще. Поменять таймаут — одна строка в conftest.</details>
-2. В тесте не осталось ожиданий — куда они делись и почему тест всё равно надёжен?
-   <details>Внутрь методов страницы: каждый метод сам ждёт нужное состояние перед действием. Надёжность та же, просто скрыта за именем метода.</details>
-3. Переименовали класс `.new-todo` на сайте. Сколько файлов править?
+2. Переименовали класс `.new-todo` на сайте. Сколько файлов править?
    <details>Один — `pages/todo_page.py`, константа `TODO_INPUT`. Тесты не трогаем.</details>
-4. Как это спросят на собеседовании: «Что такое Page Object и зачем он?»
+3. Как это спросят на собеседовании: «Что такое Page Object и зачем он?»
    <details>Паттерн: страница — класс, локаторы — его поля, действия пользователя — методы; тесты работают только с методами. Даёт читаемость тестов, одну точку правки при изменении вёрстки, переиспользование действий. Пример: SeleniumTodoPage в моём проекте.</details>
