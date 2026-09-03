@@ -131,7 +131,8 @@ python -m pytest -m "not smoke and not ui"
 Исправление — явное исключение категории:
 
 ```yaml
-python -m pytest -m "not smoke and not ui and not selenium" ```
+python -m pytest -m "not smoke and not ui and not selenium" \
+```
 
 После правки регрессия вернулась к прежнему виду: `95 passed, 17 deselected`, шаг снова около полутора секунд. Сумма `passed + deselected` осталась равной 112 — все тесты проекта учтены.
 
